@@ -466,6 +466,19 @@ public class GeneratorTests : IDisposable, IAsyncLifetime
     }
 
     [Fact]
+    public void BeginPaint_FriendlyOverloadReturnsSafeHandle()
+    {
+        this.generator = this.CreateGenerator();
+        Assert.True(this.generator.TryGenerate("BeginPaint", CancellationToken.None));
+        this.CollectGeneratedCode(this.generator);
+        this.AssertNoDiagnostics();
+
+        Assert.Contains(
+            this.FindGeneratedMethod("BeginPaint"),
+            method => method!.ReturnType is QualifiedNameSyntax { Right: { Identifier: { ValueText: "ReleaseDCSafeHandle" } } });
+    }
+
+    [Fact]
     public void OutHandleParameterBecomesSafeHandle()
     {
         this.generator = this.CreateGenerator();
